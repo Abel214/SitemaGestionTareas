@@ -1,5 +1,6 @@
+// @ts-ignore
 import React, { useState } from 'react';
-import {User, ChevronDown, Search, FileText, CheckCircle, Clock, BookOpen} from 'lucide-react';
+import {User, ChevronDown, Search, FileText, CheckCircle, Clock, BookOpen, ChevronLeft, ChevronRight} from 'lucide-react';
 import { getDashboardConfig } from '../../sidebar/sidebar';
 
 import '../inicio.css';
@@ -8,6 +9,8 @@ import '../materiaVista/materiaVista.css';
 import AcademicCalendar from "../calendario/calendario";
 import UnidadesMenu from "../unidades/unidades";
 import MenuDesplegable from "../../menuDesplegable/menuEstudiante";
+import SGTTABlack from '../../../assets/Common/SGTTABlack.png';
+
 const DashboardPanelMateria = ({
   userType = 'studentMateria',
   userName = 'Estudiante',
@@ -22,6 +25,7 @@ const DashboardPanelMateria = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Estado para la visibilidad de la sidebar
 
   const config = getDashboardConfig(userType);
   const currentSubject = subjects[0] || {};
@@ -32,7 +36,15 @@ const DashboardPanelMateria = ({
     } else {
       setSelectedSection(itemId);
       setShowSearch(false);
+      // Cerrar sidebar al hacer clic en un elemento del menú en vista móvil
+      if (window.innerWidth <= 768) {
+        setIsSidebarOpen(false);
+      }
     }
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
   // Datos de ejemplo para las unidades (normalmente vendrían como props)
@@ -158,6 +170,24 @@ const DashboardPanelMateria = ({
       title: 'ACD: Taller de revisión bibliográfica',
       status: 'pending',
       dueDate: '2025-07-20'
+    },
+    {
+      id: 4,
+      title: 'Exposición: Modelos de Ciclo de Vida del Software',
+      status: 'pending',
+      dueDate: '2025-07-25'
+    },
+    {
+      id: 5,
+      title: 'Foro: Debate sobre metodologías ágiles vs. tradicionales',
+      status: 'pending',
+      dueDate: '2025-07-28'
+    },
+    {
+      id: 6,
+      title: 'Práctica 1: Implementación de un Sprint en Scrum',
+      status: 'completed',
+      dueDate: '2025-07-10'
     }
   ];
 
@@ -190,15 +220,15 @@ const DashboardPanelMateria = ({
             <h3 className="tareas-title">Tareas Pendientes</h3>
             <div className="tareas-list">
               {subjectAssignments.map(task => (
-                <div key={task.id} className="tarea-item">
+                <div key={task.id} className={`tarea-item ${task.status}`}> {/* Add task.status class */}
                   <div className="tarea-icon">
                     <FileText size={18}/>
                   </div>
                   <div className="tarea-content">
                     <h4 className="tarea-title">{task.title}</h4>
                     <div className="tarea-meta">
-                      <span className="tarea-status">
-                        <CheckCircle size={14}/> Pendiente
+                      <span className={`tarea-status ${task.status}`}> {/* Add task.status class */}
+                        <CheckCircle size={14}/> {task.status === 'pending' ? 'Pendiente' : 'Completada'}
                       </span>
                       <span className="tarea-date">
                         <Clock size={14}/> Entrega: {task.dueDate}
@@ -215,20 +245,22 @@ const DashboardPanelMateria = ({
   };
 
   return (
-    <div className="dashboard-container">
+    <div className={`dashboard-container ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
       {/* Sidebar */}
-      <div className="sidebar">
+      <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-header">
           <div className="sidebar-title">
-            <User size={24}/>
-            <h1>
-              {userType === 'teacher'
-                  ? 'Docente'
-                  : userType === 'student' || userType === 'studentMateria'
-                      ? 'Estudiante'
-                      : 'Administrador'}
-            </h1>
-
+            <img src={SGTTABlack} alt="Logo SGTTA" className="sidebar-logo" />
+            <div className="sidebar-text-group">
+              <span className="sidebar-main-title">SGTTA</span>
+              <h1 className="sidebar-user-role">
+                {userType === 'teacher'
+                    ? 'Docente'
+                    : userType === 'student' || userType === 'studentMateria'
+                        ? 'Estudiante'
+                        : 'Administrador'}
+              </h1>
+            </div>
           </div>
         </div>
 
@@ -255,7 +287,7 @@ const DashboardPanelMateria = ({
               }`}
             >
               <item.icon size={18} />
-              {item.label}
+              <span className="sidebar-item-label">{item.label}</span>
             </button>
           ))}
 
@@ -268,7 +300,7 @@ const DashboardPanelMateria = ({
               }`}
             >
               <BookOpen size={18} />
-              Unidades
+              <span className="sidebar-item-label">Unidades</span>
             </button>
           )}
         </nav>
@@ -282,9 +314,20 @@ const DashboardPanelMateria = ({
               className={`sidebar-nav-item ${selectedSection === item.id ? 'active' : ''}`}
             >
               <item.icon size={18} />
-              {item.label}
+              <span className="sidebar-item-label">{item.label}</span>
             </button>
           ))}
+          {/* Toggle button for sidebar at the bottom */}
+          <button className="sidebar-toggle" onClick={toggleSidebar}>
+            {isSidebarOpen ? (
+              <>
+                <ChevronLeft size={24} />
+                <span className="sidebar-toggle-text">Ocultar</span>
+              </>
+            ) : (
+              <ChevronRight size={24} />
+            )}
+          </button>
         </div>
       </div>
 
@@ -293,7 +336,7 @@ const DashboardPanelMateria = ({
         {/* Header */}
         <header className="dashboard-header">
           <div className="header-content">
-            <h1 className="main-title">Gestor de tareas</h1>
+            <h1 className="main-title" onClick={toggleSidebar} style={{ cursor: 'pointer' }}>Asignaturaㅤㅤ ㅤ</h1>
             <div className="welcome-section">
               <h2 className="welcome-title">Bienvenido {userName}</h2>
               <p className="welcome-subtitle">{config.welcomeMessage}</p>
@@ -340,6 +383,10 @@ const DashboardPanelMateria = ({
           {renderContent()}
         </div>
       </div>
+      {/* Overlay for mobile when sidebar is open */}
+      {isSidebarOpen && window.innerWidth <= 768 && (
+        <div className="sidebar-overlay" onClick={toggleSidebar}></div>
+      )}
     </div>
   );
 };
