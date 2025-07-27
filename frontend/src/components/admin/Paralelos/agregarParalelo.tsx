@@ -1,63 +1,76 @@
 import React, { useState } from 'react';
 import { Layers, X, Hash, BookOpen, User, Users, GraduationCap, Save } from 'lucide-react';
+import { paraleloService } from '../../../services/paralelo';
 
-const ModalAgregarParalelo = ({ isOpen, onClose, materias, docentes, onSave }) => {
+interface ModalAgregarParaleloProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSaveSuccess: () => void;
+  materias: Array<{ id: number; codigo: string; nombre: string; ciclo: number }>;
+  docentes: Array<{ id: number; nombre: string; especialidad: string }>;
+}
+
+const ModalAgregarParalelo: React.FC<ModalAgregarParaleloProps> = ({
+  isOpen,
+  onClose,
+  onSaveSuccess,
+  materias,
+  docentes
+}) => {
   const [newParalelo, setNewParalelo] = useState({
     codigo: '',
     letra: '',
     ciclo: '',
     cupoTotal: '',
-    materias: [],
-    docentes: [],
+    materias: [] as number[],
+    docentes: [] as number[],
     estado: 'Activo'
   });
 
+  const handleMateriaChange = (materiaId: number) => {
+    setNewParalelo(prev => ({
+      ...prev,
+      materias: prev.materias.includes(materiaId)
+        ? prev.materias.filter(id => id !== materiaId)
+        : [materiaId] // Solo permitimos una materia seleccionada
+    }));
+  };
+
+  const handleDocenteChange = (docenteId: number) => {
+    setNewParalelo(prev => ({
+      ...prev,
+      docentes: prev.docentes.includes(docenteId)
+        ? prev.docentes.filter(id => id !== docenteId)
+        : [docenteId] // Solo permitimos un docente seleccionado
+    }));
+  };
+
+  const handleSubmit = async () => {
+    if (!newParalelo.letra || !newParalelo.materias.length) {
+      alert('Debe seleccionar al menos una letra y una materia');
+      return;
+    }
+
+    try {
+      await paraleloService.createParalelo(newParalelo);
+      onSaveSuccess();
+      onClose();
+      setNewParalelo({
+        codigo: '',
+        letra: '',
+        ciclo: '',
+        cupoTotal: '',
+        materias: [],
+        docentes: [],
+        estado: 'Activo'
+      });
+    } catch (error) {
+      console.error('Error al crear paralelo:', error);
+      alert(`Error: ${error.response?.data?.detail || error.message}`);
+    }
+  };
+
   if (!isOpen) return null;
-
-  const handleMateriaChange = (materiaId) => {
-    setNewParalelo(prev => {
-      if (prev.materias.includes(materiaId)) {
-        return {
-          ...prev,
-          materias: prev.materias.filter(id => id !== materiaId)
-        };
-      } else {
-        return {
-          ...prev,
-          materias: [...prev.materias, materiaId]
-        };
-      }
-    });
-  };
-
-  const handleDocenteChange = (docenteId) => {
-    setNewParalelo(prev => {
-      if (prev.docentes.includes(docenteId)) {
-        return {
-          ...prev,
-          docentes: prev.docentes.filter(id => id !== docenteId)
-        };
-      } else {
-        return {
-          ...prev,
-          docentes: [...prev.docentes, docenteId]
-        };
-      }
-    });
-  };
-
-  const handleSubmit = () => {
-    onSave(newParalelo);
-    setNewParalelo({
-      codigo: '',
-      letra: '',
-      ciclo: '',
-      cupoTotal: '',
-      materias: [],
-      docentes: [],
-      estado: 'Activo'
-    });
-  };
 
   return (
     <div className="modal-overlay">

@@ -24,13 +24,14 @@ from django.http import JsonResponse
 from setuptools.extern import names
 
 from tareas.views import (RegisterStudentView, RegisterStaffView, login_view, csrf_token_view, UserProfileViewSet,
-                          AsignaturaViewSet,  PeriodoCicloViewSet)
+                          AsignaturaViewSet, PeriodoCicloViewSet, CicloViewSet, ParaleloViewSet)
 router = DefaultRouter()
 
 router.register(r'api/users', UserProfileViewSet, basename='user-profile')
 router.register(r'api/asignaturas', AsignaturaViewSet,basename='user-subject')
 router.register(r'api/periodos', PeriodoCicloViewSet,basename='user-periodos')
-
+router.register(r'api/ciclos', CicloViewSet,basename='user-ciclos')
+router.register(r'api/paralelos', ParaleloViewSet,basename='user-paralelos')
 
 
 urlpatterns = [

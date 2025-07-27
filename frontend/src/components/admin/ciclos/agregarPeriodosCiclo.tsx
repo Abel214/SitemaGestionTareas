@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { X, Save, Calendar, GraduationCap } from 'lucide-react';
 import axios from 'axios';
 import { getCookie } from '../../../utils/cookies';
-import {cicloService, periodoService } from '../../../services/periodos';
+import {cicloService } from '../../../services/ciclos';
+import { periodoService } from '../../../services/periodos';
 type Ciclo = { id: number; codigo: string; numero: number };
 type Props = {
   isOpen: boolean;
