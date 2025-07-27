@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Layers, X, Hash, BookOpen, User, Users, GraduationCap, Save } from 'lucide-react';
-import { paraleloService } from '../../../services/paralelo';
+import { paraleloService } from '../../../services/paralelos';
 
 interface ModalAgregarParaleloProps {
   isOpen: boolean;
