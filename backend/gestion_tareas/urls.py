@@ -23,7 +23,8 @@ from rest_framework.routers import DefaultRouter
 from django.http import JsonResponse
 from setuptools.extern import names
 
-from tareas.views import (RegisterStudentView, RegisterStaffView, login_view, csrf_token_view, UserProfileViewSet,AsignaturaViewSet,PeriodCicloViewSet)
+from tareas.views import (RegisterStudentView, RegisterStaffView, login_view, csrf_token_view, UserProfileViewSet,
+                          AsignaturaViewSet,  PeriodoCicloViewSet)
 router = DefaultRouter()
 
 router.register(r'api/users', UserProfileViewSet, basename='user-profile')
